@@ -1,7 +1,7 @@
 # TRACKER — Rastreabilidade dos documentos
 
 Mapeia cada item dos documentos ao trecho da [TRANSCRICAO](../TRANSCRICAO.md) ou ao código.
-Total de linhas: **180**; Fonte TRANSCRICAO: **142** (78%); Fonte CODIGO: **38**.
+Total de linhas: **206**; Fonte TRANSCRICAO: **167** (81%); Fonte CODIGO: **39**.
 
 Itens marcados **[Proposta]** nos documentos são detalhamento de implementação sem decisão explícita na reunião (por exemplo, critério de sucesso 2xx, nomes de tabelas auxiliares e métricas): ficam consolidados em `FDD-PROP-01` e devem ser validados na sessão de revisão ([09:50] Larissa).
 
@@ -124,7 +124,7 @@ Itens marcados **[Proposta]** nos documentos são detalhamento de implementaçã
 | ADR-008-c | docs/adrs/ADR-008-payload-headers-e-limites-de-entrega.md | Decisão | Timeout de 10 s | TRANSCRICAO | [09:42] Diego |
 | FDD-OT-01 | docs/FDD.md | Objetivo técnico | Nenhum evento perdido nem de transação revertida | TRANSCRICAO | [09:06] Diego |
 | FDD-OT-02 | docs/FDD.md | Objetivo técnico | Latência < 10 s com polling de 2 s | TRANSCRICAO | [09:09] Diego |
-| FDD-OT-03 | docs/FDD.md | Objetivo técnico | Worker em processo separado, mesmo banco e stack | TRANSCRICAO | [09:11] Diego |
+| FDD-OT-03 | docs/FDD.md | Objetivo técnico | Entrega at-least-once, assinada, com retry e DLQ | TRANSCRICAO | [09:24] Diego |
 | FDD-EXC-01 | docs/FDD.md | Exclusão | Fora do escopo: e-mail, rate limiting, dashboard, arquivamento | TRANSCRICAO | [09:37] Larissa |
 | FDD-DADOS-01 | docs/FDD.md | Modelo de dados | Tabela webhook_outbox com índices em status e created_at | TRANSCRICAO | [09:08] Diego |
 | FDD-DADOS-02 | docs/FDD.md | Modelo de dados | Tabela webhook_dead_letter com payload, motivo e timestamp | TRANSCRICAO | [09:18] Diego |
@@ -187,3 +187,29 @@ Itens marcados **[Proposta]** nos documentos são detalhamento de implementaçã
 | FDD-RSK-01 | docs/FDD.md | Risco | Prazo de 3 sprints | TRANSCRICAO | [09:46] Larissa |
 | FDD-RSK-02 | docs/FDD.md | Risco | Vazamento de secret em log de cliente | TRANSCRICAO | [09:22] Diego |
 | FDD-PROP-01 | docs/FDD.md | Proposta (sem origem direta) | Critério de sucesso 2xx, reset de PROCESSING no boot, tamanho do lote: detalhamento de implementação | CODIGO | src/modules/orders/order.service.ts |
+| FDD-OT-04 | docs/FDD.md | Objetivo técnico | Reuso integral dos padrões do projeto | TRANSCRICAO | [09:30] Larissa |
+| FDD-OT-05 | docs/FDD.md | Objetivo técnico | Worker em processo separado, mesmo banco e stack | TRANSCRICAO | [09:11] Diego |
+| PRD-CA-01 | docs/PRD.md | Critério de aceite | Cadastro com URL https devolve a secret; http recusada | TRANSCRICAO | [09:23] Sofia |
+| PRD-CA-02 | docs/PRD.md | Critério de aceite | Mudança de status gera 1 evento por endpoint interessado e nenhum sem interessados | TRANSCRICAO | [09:34] Bruno |
+| PRD-CA-03 | docs/PRD.md | Critério de aceite | Cliente recebe evento em menos de 10 s com headers e assinatura | TRANSCRICAO | [09:02] Marcos |
+| PRD-CA-04 | docs/PRD.md | Critério de aceite | Reentrega conforme backoff e, esgotado, evento na DLQ | TRANSCRICAO | [09:17] Larissa |
+| PRD-CA-05 | docs/PRD.md | Critério de aceite | ADMIN reprocessa DLQ; OPERATOR recebe 403; log do executor | TRANSCRICAO | [09:36] Sofia |
+| PRD-CA-06 | docs/PRD.md | Critério de aceite | Secret antiga deixa de valer após 24 h da rotação | TRANSCRICAO | [09:21] Sofia |
+| PRD-CA-07 | docs/PRD.md | Critério de aceite | Histórico mostra últimas 100 entregas com resultado, payload, resposta e tempo | TRANSCRICAO | [09:34] Marcos |
+| PRD-CA-08 | docs/PRD.md | Critério de aceite | Nada fora de escopo (e-mail, rate limiting, painel) presente | TRANSCRICAO | [09:37] Larissa |
+| FDD-CA-03 | docs/FDD.md | Critério de aceite técnico | Evento entregue em < 10 s (p95) sem falha | TRANSCRICAO | [09:02] Marcos |
+| FDD-CA-04 | docs/FDD.md | Critério de aceite técnico | Corpo assinado com HMAC-SHA256 e headers conforme contrato | TRANSCRICAO | [09:44] Diego |
+| FDD-CA-05 | docs/FDD.md | Critério de aceite técnico | Falhas seguem 1m/5m/30m/2h/12h e vão à DLQ | TRANSCRICAO | [09:17] Larissa |
+| FDD-CA-06 | docs/FDD.md | Critério de aceite técnico | Replay só por ADMIN, registra userId e reinsere como pendente | TRANSCRICAO | [09:36] Sofia |
+| FDD-CA-07 | docs/FDD.md | Critério de aceite técnico | URL http rejeitada; payload > 64 KB não enviado | TRANSCRICAO | [09:23] Sofia |
+| FDD-CA-08 | docs/FDD.md | Critério de aceite técnico | Secret anterior expira em 24 h após rotação | TRANSCRICAO | [09:21] Sofia |
+| FDD-CA-09 | docs/FDD.md | Critério de aceite técnico | Parar a API não interrompe o worker | TRANSCRICAO | [09:11] Diego |
+| FDD-CA-10 | docs/FDD.md | Critério de aceite técnico | Erros do módulo com prefixo WEBHOOK_ e formato do errorMiddleware | TRANSCRICAO | [09:29] Larissa |
+| FDD-ERR-WEBHOOK_CUSTOMER_NOT_FOUND | docs/FDD.md | Matriz de erros | WEBHOOK_CUSTOMER_NOT_FOUND: customerId inexistente no cadastro (análogo ao NotFoundError('Customer') de pedidos) | CODIGO | src/modules/orders/order.service.ts |
+| FDD-ERR-WEBHOOK_DEAD_LETTER_NOT_FOUND | docs/FDD.md | Matriz de erros | WEBHOOK_DEAD_LETTER_NOT_FOUND: Id de DLQ inexistente no replay (derivado do endpoint de replay) | TRANSCRICAO | [09:18] Diego |
+| FDD-ERR-WEBHOOK_DELIVERY_FAILED | docs/FDD.md | Matriz de erros | WEBHOOK_DELIVERY_FAILED: Resposta não-2xx ou erro de rede vira falha e retry (critério 2xx é proposta) | TRANSCRICAO | [09:42] Diego |
+| FDD-ERR-WEBHOOK_DELIVERY_TIMEOUT | docs/FDD.md | Matriz de erros | WEBHOOK_DELIVERY_TIMEOUT: Sem resposta em 10 s é falha e vai para retry | TRANSCRICAO | [09:42] Diego |
+| FDD-ERR-WEBHOOK_ENDPOINT_INACTIVE | docs/FDD.md | Matriz de erros | WEBHOOK_ENDPOINT_INACTIVE: Endpoint removido ou inativo antes do envio (derivado do estado ativo e do DELETE) | TRANSCRICAO | [09:21] Bruno |
+| FDD-ERR-WEBHOOK_OUTBOX_INSERT_FAILED | docs/FDD.md | Matriz de erros | WEBHOOK_OUTBOX_INSERT_FAILED: Falha no insert da outbox causa rollback da mudança de status | TRANSCRICAO | [09:40] Bruno |
+| FDD-ERR-WEBHOOK_PAYLOAD_TOO_LARGE | docs/FDD.md | Matriz de erros | WEBHOOK_PAYLOAD_TOO_LARGE: Payload acima de 64 KB não é enviado | TRANSCRICAO | [09:23] Sofia |
+| FDD-ERR-WEBHOOK_REPLAY_NOT_ALLOWED | docs/FDD.md | Matriz de erros | WEBHOOK_REPLAY_NOT_ALLOWED: Replay de evento já reprocessado (proposta, derivada do replay manual) | TRANSCRICAO | [09:18] Diego |
