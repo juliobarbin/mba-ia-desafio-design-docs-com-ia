@@ -273,6 +273,8 @@ O projeto só possui **logs com Pino**. Métricas e tracing **não existem** no 
 
 ## 10. Integração com o sistema existente
 
+> Todos os arquivos da tabela **existem hoje** no repositório e serão alterados/reutilizados. Os arquivos **a criar** pela implementação (`src/worker.ts`, `src/modules/webhooks/*`, nova migration em `prisma/migrations/`) são citados no texto apenas como destino futuro e não constam como existentes.
+
 | Arquivo (existe no repositório) | Como o módulo se integra |
 |---|---|
 | `src/modules/orders/order.service.ts` | `changeStatus` chama `publishWebhookEvent(tx, order, from, to)` logo após `tx.orderStatusHistory.create`, dentro da `$transaction`. `create` não muda (RFC-OQ-05). |
