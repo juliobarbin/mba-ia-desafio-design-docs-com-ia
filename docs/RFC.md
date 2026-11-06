@@ -10,7 +10,7 @@
 
 ## 1. Resumo executivo (TL;DR)
 
-Propomos notificar clientes B2B por **webhooks HTTP de saída** a cada mudança de status de pedido, usando o **padrão Outbox no MySQL existente**: o evento é gravado na mesma transação que muda o status e um **worker em processo separado**, em polling de 2 s, entrega com **assinatura HMAC-SHA256**, **retry com backoff** (5 tentativas) e **DLQ**. A entrega é **at-least-once**, com `X-Event-Id` para deduplicação. Todo o módulo segue os padrões já existentes no OMS. Estimativa: três sprints, incluindo revisão de segurança. Pedimos revisão especialmente nas cinco questões em aberto da seção 5.
+Propomos notificar clientes B2B por **webhooks HTTP de saída** a cada mudança de status de pedido, usando o **padrão Outbox no MySQL existente**: o evento é gravado na mesma transação que muda o status e um **worker em processo separado**, em polling de 2 s, entrega com **assinatura HMAC-SHA256**, **retry com backoff** (5 tentativas) e **DLQ**. A entrega é **at-least-once**, com `X-Event-Id` para deduplicação. Todo o módulo segue os padrões já existentes no OMS. Estimativa: três sprints, incluindo revisão de segurança. Pedimos revisão especialmente nas sete questões em aberto da seção 5.
 
 ## 2. Contexto e problema
 
